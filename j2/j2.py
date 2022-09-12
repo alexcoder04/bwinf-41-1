@@ -1,38 +1,52 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-def read_file(file):
+def read_file(file: str) -> dict:
     info = {}
-    with open(f"./material/Junior2/container{file}.txt") as f:
-        for l in f.readlines():
-            if l.strip() == "":
+    with open(file) as f:
+        for line in f.readlines():
+            # skip blank lines
+            if line.strip() == "":
                 continue
-            [larger, smaller] = l.strip().split()
+            # parse the line
+            [heavier, lighter] = line.strip().split()
+            # try to add the heavier to the list, create new list if it doesn't exist
             try:
-                info[smaller].append(larger)
+                info[lighter].append(heavier)
             except KeyError:
-                info[smaller] = [larger]
+                info[lighter] = [heavier]
     return info
 
-def run_to_end(info, key, trace):
+def run_to_heaviest(info: dict, key: str) -> set:
     results = set()
-    for c in info[key]:
-        if c in info:
-            _trace = trace + [c]
-            results.update(run_to_end(info, c, _trace))
+    # check each container, that is heavier than the given one
+    for heavier_container in info[key]:
+        # if we can run further and find even heavier containers, then recurse
+        if heavier_container in info:
+            results.update(run_to_heaviest(info, heavier_container))
             continue
-        #print("adding final res: " + c + ", " + str(trace))
-        results.add(c)
+        # add to results, if this is the heaviest we can get
+        results.add(heavier_container)
     return results
 
-def run(n):
-    info = read_file(n)
-    print(info)
+def run(example_number: int = 0) -> None:
+    # read in the data
+    info = read_file(f"./material/Junior2/container{example_number}.txt")
+    print(f"{example_number}: Given (light->heavy): {info}")
 
+    # for each container, run the path to the heaviest
     results = set()
-    for c in info:
-        results.update(run_to_end(info, c, [c]))
+    for container in info:
+        results.update(run_to_heaviest(info, container))
 
-    print("Results: ", results)
+    # if all paths run to the same container, we have the solution
+    if len(results) == 1:
+        print(f" => The heaviest container is {results.pop()}")
+        return
+    
+    # if not, we print out possible solutions
+    print(f"=> Possibilities for heaviest container: {results}")
 
-for i in [0, 1, 2, 3, 4]:
-    run(i)
+if __name__ == "__main__":
+    # run on all examples
+    for i in [0, 1, 2, 3, 4]:
+        run(i)
