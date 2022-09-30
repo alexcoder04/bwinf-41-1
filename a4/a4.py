@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 
 from utils import avg, read_data
-from bsqueues import FiFoQueue, FiSoQueue
+from bsqueues import FiFoQueue, FiSoQueue, BaseQueue
 
-def run(fifo: bool = True, example: int = 0, verbose: bool = False):
-    if fifo:
-        orders = FiFoQueue()
-    else:
-        orders = FiSoQueue()
+def run(QueueType: BaseQueue, example: int = 0, verbose: bool = False):
+    orders = QueueType()
 
     for i in read_data(example):
         orders.put(i)
@@ -34,5 +31,5 @@ def run(fifo: bool = True, example: int = 0, verbose: bool = False):
 
 if __name__ == "__main__":
     for i in range(5):
-        run(fifo=True, example=i, verbose=False)
-        run(fifo=False, example=i, verbose=False)
+        run(FiFoQueue, example=i, verbose=False)
+        run(FiSoQueue, example=i, verbose=False)
