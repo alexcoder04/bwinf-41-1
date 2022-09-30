@@ -1,26 +1,38 @@
+#!/usr/bin/env python3
+
 from utils import avg, read_data
 from bsqueues import FiFoQueue, FiSoQueue
 
-orders = FiFoQueue()
-#orders = FiSoQueue()
-for i in read_data(0):
-    orders.put(i)
+def run(fifo: bool = True, example: int = 0, verbose: bool = False):
+    if fifo:
+        orders = FiFoQueue()
+    else:
+        orders = FiSoQueue()
 
-current_time = 0
-orders_stats = []
-for _ in range(len(orders)):
-    current_order = orders.get()
-    if current_time < current_order.start:
-        current_time = current_order.start
-    print(f"{current_time}, starting {current_order}")
-    current_time += current_order.length
-    print(f"{current_time}, finished {current_order} in {current_time-current_order.start}/{current_time-current_order.start-current_order.length}")
-    orders_stats.append((current_order, current_time - current_order.start))
+    for i in read_data(example):
+        orders.put(i)
 
-wartezeiten = []
-for i in orders_stats:
-    print(f"{i[0]} in {i[1]}/{i[1]-i[0].length}")
-    wartezeiten.append(i[1])
+    order_stats = []
+    while not orders.empty():
+        current_order = orders.get()
+        if verbose:
+            print(f"{orders.get_time()}, starting {current_order}")
+        orders.tick(current_order.length)
+        if verbose:
+            print(f"{orders.get_time()}, finished {current_order} in {orders.get_time() - current_order.start}/{orders.get_time() - current_order.start-current_order.length}")
+        order_stats.append((current_order, orders.get_time() - current_order.start))
 
-print("avg:", avg(wartezeiten))
-print("max:", max(wartezeiten))
+    wartezeiten = []
+    for i in order_stats:
+        if verbose:
+            print(f"{i[0]} in {i[1]}/{i[1]-i[0].length}")
+        wartezeiten.append(i[1])
+
+    print(f" --- Example {example} using {orders.type} --- ")
+    print("avg:", avg(wartezeiten))
+    print("max:", max(wartezeiten))
+
+if __name__ == "__main__":
+    for i in range(5):
+        run(fifo=True, example=i, verbose=False)
+        run(fifo=False, example=i, verbose=False)
