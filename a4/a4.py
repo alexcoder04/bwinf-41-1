@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# not sure if this really works as intended
+
 from utils import avg, read_data
 from bsqueues import FiFoQueue, FiSoQueue, BaseQueue
 

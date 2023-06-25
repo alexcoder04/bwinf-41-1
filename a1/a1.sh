@@ -1,5 +1,7 @@
 #!/bin/sh
 # this script is posix compliant, so we can use /bin/sh
+# 
+# a rather hacky solution written in shell
 
 TASK_FOLDER="${TASK_FOLDER:-./material/Aufgabe1}"
 
